@@ -147,3 +147,38 @@ test('LinkedIn search results: only a profile matching both the name and the com
     assert.equal(pickLinkedinResult([], who), '');
     assert.equal(pickLinkedinResult(hits, { ...who, name: 'Madonna' }), '');
 });
+
+test('UI labels and places are not read as people (the "Due Date" bug)', () => {
+    for (const bad of ['Due Date', 'Read More', 'Learn More', 'Privacy Policy', 'New Delhi', 'Get Started', 'Book Demo', 'Latest News', 'Case Studies']) {
+        assert.equal(looksLikeName(bad), false, bad);
+    }
+    for (const good of ['Asha Rao', 'Vikram Shah', 'Meera Nair', 'Rohan Gupta']) assert.equal(looksLikeName(good), true, good);
+    const html = '<div><h3>Due Date</h3><p>Co-founder</p></div><div><h3>Asha Rao</h3><p>Founder &amp; CEO</p></div>';
+    const names = extractPeople(load(html)).map((p) => p.name);
+    assert.deepEqual(names, ['Asha Rao']);
+});
+
+test('non-company sites such as .org bodies are not candidates', () => {
+    assert.equal(isCompanySite('https://www.iaea.org/'), false);
+    assert.equal(isCompanySite('https://danbrisebois.com/'), true);
+});
+
+test('search queries carry no -site operators', async () => {
+    const { buildQueries } = await import('../sites.js');
+    const qs = buildQueries({ keywords: ['fintech'], locations: ['India'] });
+    assert.ok(qs.length >= 3);
+    assert.ok(qs.every((q) => !q.includes('-site:')));
+});
+
+test('location evidence: .in domain, +91, Indian city, or location text; none means no', async () => {
+    const { locationEvidence } = await import('../qualify.js');
+    assert.equal(locationEvidence('hello world', 'acme.in', ['India']), true);
+    assert.equal(locationEvidence('call +91 98765 43210', 'acme.com', ['India']), true);
+    assert.equal(locationEvidence('our office in bengaluru', 'acme.io', ['India']), true);
+    assert.equal(locationEvidence('maternity care in ontario canada', 'aspenmaternity.ca', ['India']), false);
+    const html = '<title>Acme fintech</title><body>We are building payments. Seed funded. Founded in 2021. Fintech fintech. Toronto, Canada.</body>';
+    const q = scoreStartup(load(html), { keywords: ['fintech'], locations: ['India'], host: 'acme.com' });
+    assert.equal(q.locationOk, false);
+    assert.equal(passes(q, 1, { requireLocation: true }), false);
+    assert.equal(passes(q, 1, { requireLocation: false }), true);
+});

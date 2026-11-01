@@ -42,3 +42,10 @@ The link comes from the startup's own team page when it shows one. If not, and `
 Input: `industryKeywords` (required), `onlyGmail`, `locations`, `companyWebsites`, `maxCompanies`, `startupScoreMin`, `minFoundedYear`, `excludeDomains`, `onlyWithContact`, `preferHiringLead`, `useSearch`, `llmQualify`, `anthropicApiKey`.
 
 Run `npm test` for the tests.
+
+## Troubleshooting weak results
+
+- **Discovery is the weak step.** Google results often come back as redirect links the search actor cannot resolve, and the rest are mostly directories. The log line starting with "Search:" shows how many results were kept and why others were dropped. For better results, set `useSearch` to off and pass real startup websites in `companyWebsites` (for example the company domains from a leads export).
+- **Blocked sites (403 or 429).** Keep Apify Proxy on (the default).
+- **Too few results.** Turn off `requireLocationMatch`, lower `startupScoreMin`, or use broader keywords.
+- **Sites that need JavaScript** show no team or contact details to this crawler.

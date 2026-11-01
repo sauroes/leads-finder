@@ -13,7 +13,7 @@ try {
     const input = (await Actor.getInput()) ?? {};
     const {
         industryKeywords = [], locations = ['India'], companyWebsites = [], maxCompanies = 30, maxSearchPages = 2,
-        startupScoreMin = 4, minFoundedYear = 2015, excludeDomains = [], onlyWithContact = true, preferHiringLead = false, useSearch = true, onlyGmail = false, followPersonalSites = true, guessEmails = false, findLinkedin = true,
+        startupScoreMin = 4, minFoundedYear = 2015, requireLocationMatch = true, excludeDomains = [], onlyWithContact = true, preferHiringLead = false, useSearch = true, onlyGmail = false, followPersonalSites = true, guessEmails = false, findLinkedin = true,
         llmQualify = false, anthropicApiKey, llmModel = 'claude-haiku-5-5', proxyConfiguration,
     } = input;
 
@@ -44,7 +44,7 @@ try {
 
     // 2. Read each homepage, keep the ones that look like startups in your industries, then read their about/team/contact pages.
     const companies = new Map();
-    const stats = { candidates: byDomain.size, fetchFailed: 0, rejected: { 'no industry match': 0, 'founded too long ago': 0, 'looks established': 0, 'low score': 0 }, overLimit: 0 };
+    const stats = { candidates: byDomain.size, fetchFailed: 0, rejected: { 'no industry match': 0, 'not in target location': 0, 'founded too long ago': 0, 'looks established': 0, 'low score': 0 }, overLimit: 0 };
     let qualifiedCount = 0;
 
     const collect = async ($, pageUrl, rec, self) => {
@@ -81,7 +81,7 @@ try {
         proxyConfiguration: proxy,
         maxConcurrency: 8,
         maxRequestsPerMinute: 120,
-        maxRequestRetries: 1,
+        maxRequestRetries: 3,
         respectRobotsTxtFile: true,
         requestHandlerTimeoutSecs: 45,
         async requestHandler({ $, request, crawler: self }) {
@@ -95,8 +95,8 @@ try {
             }
             if (label === 'HOME') {
                 rec = { domain, website: pageUrl, name: companyName($, domain), people: new Map(), emails: new Map(), personSites: new Map(), personEmails: new Map(), links: { careersUrl: '', contactFormUrl: '', companyLinkedin: '' } };
-                const q = scoreStartup($, { keywords, minFoundedYear, locations });
-                let ok = passes(q, startupScoreMin);
+                const q = scoreStartup($, { keywords, minFoundedYear, locations, host: domain });
+                let ok = passes(q, startupScoreMin, { requireLocation: requireLocationMatch });
                 if (llm && q.hasIndustry && !q.tooOld) {
                     try {
                         const v = await qualifyWithLlm(clean($('body').text()), { keywords, ...llm });
@@ -107,7 +107,7 @@ try {
                 }
                 rec.quality = q;
                 if (!ok) {
-                    const why = !q.hasIndustry ? 'no industry match' : q.tooOld ? 'founded too long ago' : q.tooBig ? 'looks established' : 'low score';
+                    const why = !q.hasIndustry ? 'no industry match' : (requireLocationMatch && q.locationOk === false) ? 'not in target location' : q.tooOld ? 'founded too long ago' : q.tooBig ? 'looks established' : 'low score';
                     stats.rejected[why]++;
                     return;
                 }

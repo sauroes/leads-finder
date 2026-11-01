@@ -8,7 +8,7 @@ const ROLE_RULES = [
     { kind: 'leader', weight: 5, re: /\b(coo|chief operating|cto|chief technology|cpo|chief product|head of (operations|product|engineering|growth|marketing|design))\b/i },
 ];
 const FOUNDING_STAFF = /founding\s+(engineer|designer|member|team|marketer|product|sales|ae|developer|analyst)/i;
-const NOT_NAME = /\b(team|about|our|join|us|careers?|contact|read|more|view|profile|linkedin|the|and|meet|leadership|founders?|story|company|mission|values|learn|apply|home|blog|press|news|ceo|cto|coo|head|manager|director|intern)\b/i;
+const NOT_NAME = /\b(team|about|our|join|us|careers?|contact|read|more|view|profile|linkedin|the|and|meet|leadership|founders?|story|company|mission|values|learn|apply|home|blog|press|news|ceo|cto|coo|head|manager|director|intern|due|date|dates|time|new|latest|top|best|free|get|got|started|start|know|see|all|your|my|we|you|how|why|what|when|who|where|terms|privacy|policy|cookies?|login|log|sign|signup|register|subscribe|download|share|follow|like|comment|comments|posted|published|updated|min|minutes|ago|today|yesterday|view|show|hide|next|previous|back|read|book|demo|call|email|phone|address|office|location|services?|products?|solutions?|pricing|plans?|features?|resources?|customers?|partners?|investors?|events?|webinars?|guides?|reports?|cases?|studies|study|help|support|faq|careers|jobs|openings?|india|delhi|mumbai|bengaluru|bangalore|hyderabad|chennai|pune|kolkata|gurgaon|gurugram|noida|jaipur|ahmedabad|goa|kerala|new york|united|states|kingdom|singapore|dubai|january|february|march|april|may|june|july|august|september|october|november|december)\b/i;
 
 export function classifyRole(title) {
     const t = clean(title);

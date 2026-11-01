@@ -30,18 +30,18 @@ export function isCompanySite(url, excludeDomains = []) {
     if (!host || !host.includes('.')) return false;
     const domain = registrableDomain(host);
     if (excludeDomains.some((d) => domain === d || host.endsWith(`.${d}`))) return false;
-    if (/\.(gov|edu)(\.[a-z]{2})?$|\.ac\.[a-z]{2}$/.test(host)) return false;
+    if (/\.(gov|edu|org|int|mil|museum)(\.[a-z]{2})?$|\.ac\.[a-z]{2}$/.test(host)) return false;
     return !host.split('.').some((l) => NON_COMPANY_NAMES.includes(l)) && !/^x\.com$/.test(host);
 }
 
 export function buildQueries({ keywords, locations }) {
-    const exclude = ['linkedin.com', 'crunchbase.com', 'tracxn.com', 'inc42.com', 'yourstory.com', 'medium.com']
-        .map((d) => `-site:${d}`).join(' ');
+    // No "-site:" operators: the Google Search Scraper flags them as badly formatted, and directories are filtered in code anyway.
     const out = [];
     for (const kw of keywords) {
         for (const loc of locations) {
-            out.push(`${kw} startup ${loc} "our team" founders ${exclude}`);
-            out.push(`${kw} startup ${loc} "about us" "founded in" ("seed" OR "pre-seed" OR "backed by") ${exclude}`);
+            out.push(`"${kw}" startup ${loc} "our team" "co-founder"`);
+            out.push(`"${kw}" startup ${loc} "about us" ("seed" OR "pre-seed" OR "backed by" OR "incubated")`);
+            out.push(`"${kw}" company ${loc} "founded in" "meet the founders"`);
         }
     }
     return out;
@@ -55,17 +55,24 @@ export async function discoverCompanySites({ keywords, locations, pages = 2, exc
     });
     const { items } = await Actor.apifyClient.dataset(run.defaultDatasetId).listItems();
     const byDomain = new Map();
-    let skipped = 0;
+    const dropped = { unresolvedGoogleRedirect: 0, notHttp: 0, directoryOrNews: 0 };
+    let total = 0;
     for (const page of items) {
         for (const hit of page.organicResults ?? []) {
+            total++;
             const url = String(hit.url ?? '');
-            if (!url.startsWith('http') || url.includes('google.')) { skipped++; continue; }
-            if (!isCompanySite(url, excludeDomains)) { skipped++; continue; }
+            if (/google\.[a-z.]+\/goto/i.test(url)) { dropped.unresolvedGoogleRedirect++; continue; }
+            if (!url.startsWith('http') || url.includes('google.')) { dropped.notHttp++; continue; }
+            if (!isCompanySite(url)) { dropped.directoryOrNews++; continue; }
+            if (!isCompanySite(url, excludeDomains)) { dropped.directoryOrNews++; continue; }
             const domain = registrableDomain(hostOf(url));
             if (!byDomain.has(domain)) byDomain.set(domain, `${new URL(url).origin}/`);
         }
     }
-    log.info(`Search: ${byDomain.size} company site(s) found, ${skipped} result(s) skipped (news, directories, social, job boards).`);
+    log.info(`Search: ${total} result(s), ${byDomain.size} company site(s) kept. Dropped: ${dropped.unresolvedGoogleRedirect} unresolved Google redirects, ${dropped.directoryOrNews} directories/news/non-company, ${dropped.notHttp} other.`);
+    if (total && dropped.unresolvedGoogleRedirect / total > 0.2) {
+        log.warning(`${dropped.unresolvedGoogleRedirect} of ${total} search results were Google redirect links the search actor could not resolve, so they were lost. Add websites yourself in companyWebsites, or seed this actor from a leads list.`);
+    }
     return [...byDomain.values()].slice(0, limit);
 }
 

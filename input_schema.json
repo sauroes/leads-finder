@@ -89,8 +89,14 @@
     "proxyConfiguration": {
       "title": "Proxy",
       "type": "object",
-      "description": "Optional. Most startup sites work without one.",
-      "editor": "proxy"
+      "description": "Many startup sites block datacenter requests with 403 or 429 errors. Apify Proxy is on by default.",
+      "editor": "proxy",
+      "default": {
+        "useApifyProxy": true
+      },
+      "prefill": {
+        "useApifyProxy": true
+      }
     },
     "onlyWithContact": {
       "title": "Only startups with a contact",
@@ -132,6 +138,12 @@
       "title": "Find LinkedIn links for the contacts",
       "type": "boolean",
       "description": "If the startup's site does not link a contact's LinkedIn profile, look the person up with a Google search for their name and company. Only profile links from public search results are used, and only when name and company both match. Uses the Google Search Scraper, which bills your Apify account.",
+      "default": true
+    },
+    "requireLocationMatch": {
+      "title": "Must show it is in your location",
+      "type": "boolean",
+      "description": "Drop sites that give no sign of being in your locations (a .in domain, +91 phone, an Indian city, or your location text). Turn off if you get too few results.",
       "default": true
     }
   },

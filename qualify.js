@@ -11,7 +11,16 @@ const BIG_SIGNS = [
 ];
 
 /** Heuristic check: does this homepage look like an early-stage startup in the user's industries? */
-export function scoreStartup($, { keywords, minFoundedYear = 2015, locations = [] }) {
+const INDIA_CITIES = /\b(india|bengaluru|bangalore|mumbai|delhi|new delhi|gurugram|gurgaon|noida|pune|hyderabad|chennai|kolkata|ahmedabad|jaipur|kochi|goa|chandigarh|indore|coimbatore|lucknow|surat|nagpur|thane|faridabad)\b|\+91[\s-]?\d/i;
+
+/** Does the page show the startup is in the places we were asked for? (.in domain, +91 numbers, city names, or the location text.) */
+export function locationEvidence(body, host, locations) {
+    const wantsIndia = locations.some((l) => /india|bengal|mumbai|delhi|pune|hyderabad|chennai|goa/i.test(l));
+    if (wantsIndia && (/\.in$/.test(host ?? '') || INDIA_CITIES.test(body))) return true;
+    return locations.some((l) => l && body.includes(l.toLowerCase()));
+}
+
+export function scoreStartup($, { keywords, minFoundedYear = 2015, locations = [], host = '' }) {
     const head = clean([$('title').text(), $('meta[name="description"]').attr('content'), $('meta[property="og:description"]').attr('content'), $('h1').first().text()].join(' ')).toLowerCase();
     const body = clean($('body').text()).toLowerCase().slice(0, 40000);
     const reasons = [];
@@ -39,12 +48,13 @@ export function scoreStartup($, { keywords, minFoundedYear = 2015, locations = [
     const big = BIG_SIGNS.filter((re) => re.test(body));
     if (big.length) { score -= 4; reasons.push('looks like an established company'); }
 
-    if (locations.some((l) => l && body.includes(l.toLowerCase()))) { score += 1; reasons.push('location mentioned'); }
+    const locationOk = locations.length ? locationEvidence(body, host, locations) : true;
+    if (locationOk && locations.length) { score += 1; reasons.push('location matches'); }
 
-    return { score, reasons, foundedYear, matchedKeywords: matched, tooOld, tooBig: big.length > 0, hasIndustry: matched.length > 0 };
+    return { score, reasons, foundedYear, matchedKeywords: matched, tooOld, tooBig: big.length > 0, hasIndustry: matched.length > 0, locationOk };
 }
 
-export const passes = (q, minScore) => q.hasIndustry && !q.tooOld && !q.tooBig && q.score >= minScore;
+export const passes = (q, minScore, { requireLocation = false } = {}) => q.hasIndustry && !q.tooOld && !q.tooBig && q.score >= minScore && (!requireLocation || q.locationOk !== false);
 
 /** Optional second opinion from Claude. Returns null if it cannot decide. */
 export async function qualifyWithLlm(text, { keywords, apiKey, model }) {
