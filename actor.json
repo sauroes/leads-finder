@@ -1,0 +1,11 @@
+{
+  "actorSpecification": 1,
+  "name": "startup-lead-finder",
+  "title": "Startup Hiring Contact Finder",
+  "description": "Finds early-stage startups in your industries and the founder or hiring lead at each, with the emails they publish.",
+  "version": "0.1",
+  "buildTag": "latest",
+  "input": "./input_schema.json",
+  "storages": { "dataset": "./dataset_schema.json" },
+  "dockerfile": "./Dockerfile"
+}

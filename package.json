@@ -1,0 +1,10 @@
+{
+  "name": "startup-lead-finder",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Finds startups in your industries and the people who decide on hiring, with the contact details they publish.",
+  "scripts": { "start": "node main.js", "test": "node --test test/*.test.js" },
+  "dependencies": { "apify": "3.7.2", "crawlee": "3.18.2" },
+  "devDependencies": { "cheerio": "1.2.0" },
+  "license": "ISC"
+}

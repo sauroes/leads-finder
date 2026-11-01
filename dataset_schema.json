@@ -1,0 +1,168 @@
+{
+  "actorSpecification": 1,
+  "fields": {},
+  "views": {
+    "leads": {
+      "title": "Hiring contacts",
+      "transformation": {
+        "fields": [
+          "company",
+          "website",
+          "industryMatch",
+          "startupScore",
+          "foundedYear",
+          "contactStatus",
+          "contactName",
+          "contactTitle",
+          "contactReason",
+          "email",
+          "emailKind",
+          "alternateName",
+          "alternateTitle",
+          "alternateEmail",
+          "hiringEmail",
+          "foundersEmail",
+          "generalEmail",
+          "linkedinUrl",
+          "linkedinType",
+          "linkedinSource",
+          "alternateLinkedinUrl",
+          "careersUrl",
+          "contactFormUrl",
+          "sourcePage",
+          "qualifyReasons",
+          "aiSummary",
+          "peopleFound",
+          "emailsFound",
+          "guessedEmail",
+          "guessBasis"
+        ]
+      },
+      "display": {
+        "component": "table",
+        "properties": {
+          "company": {
+            "label": "Startup",
+            "format": "text"
+          },
+          "website": {
+            "label": "Website",
+            "format": "link"
+          },
+          "industryMatch": {
+            "label": "Industry",
+            "format": "text"
+          },
+          "startupScore": {
+            "label": "Score",
+            "format": "number"
+          },
+          "foundedYear": {
+            "label": "Founded",
+            "format": "number"
+          },
+          "contactName": {
+            "label": "Contact",
+            "format": "text"
+          },
+          "contactTitle": {
+            "label": "Role",
+            "format": "text"
+          },
+          "contactReason": {
+            "label": "Why this person",
+            "format": "text"
+          },
+          "email": {
+            "label": "Their email",
+            "format": "text"
+          },
+          "emailKind": {
+            "label": "Email type",
+            "format": "text"
+          },
+          "alternateName": {
+            "label": "Backup contact",
+            "format": "text"
+          },
+          "alternateTitle": {
+            "label": "Backup role",
+            "format": "text"
+          },
+          "hiringEmail": {
+            "label": "Hiring inbox",
+            "format": "text"
+          },
+          "generalEmail": {
+            "label": "General inbox",
+            "format": "text"
+          },
+          "linkedinUrl": {
+            "label": "LinkedIn (from their site)",
+            "format": "link"
+          },
+          "careersUrl": {
+            "label": "Careers page",
+            "format": "link"
+          },
+          "contactFormUrl": {
+            "label": "Contact page",
+            "format": "link"
+          },
+          "sourcePage": {
+            "label": "Found on",
+            "format": "link"
+          },
+          "contactStatus": {
+            "label": "Status",
+            "format": "text"
+          },
+          "alternateEmail": {
+            "label": "Backup email",
+            "format": "text"
+          },
+          "foundersEmail": {
+            "label": "Founders inbox",
+            "format": "text"
+          },
+          "linkedinType": {
+            "label": "LinkedIn type",
+            "format": "text"
+          },
+          "qualifyReasons": {
+            "label": "Why it passed",
+            "format": "text"
+          },
+          "aiSummary": {
+            "label": "Summary",
+            "format": "text"
+          },
+          "peopleFound": {
+            "label": "People found",
+            "format": "text"
+          },
+          "emailsFound": {
+            "label": "All emails found",
+            "format": "text"
+          },
+          "guessedEmail": {
+            "label": "Guessed email (unverified)",
+            "format": "text"
+          },
+          "guessBasis": {
+            "label": "Guess basis",
+            "format": "text"
+          },
+          "linkedinSource": {
+            "label": "LinkedIn found via",
+            "format": "text"
+          },
+          "alternateLinkedinUrl": {
+            "label": "Backup LinkedIn",
+            "format": "link"
+          }
+        }
+      }
+    }
+  }
+}

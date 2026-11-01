@@ -1,0 +1,141 @@
+{
+  "title": "Startup Hiring Contact Finder",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "industryKeywords": {
+      "title": "Industry keywords",
+      "type": "array",
+      "description": "Industries or niches, e.g. fintech, edtech, climate tech, D2C. Results must clearly match these.",
+      "editor": "stringList",
+      "prefill": [
+        "fintech",
+        "edtech"
+      ]
+    },
+    "locations": {
+      "title": "Locations",
+      "type": "array",
+      "description": "Where the startups should be based, e.g. India, Bengaluru, Goa.",
+      "editor": "stringList",
+      "default": [
+        "India"
+      ]
+    },
+    "companyWebsites": {
+      "title": "Startup websites you already know (optional)",
+      "type": "array",
+      "description": "Websites to check in addition to the ones found by search.",
+      "editor": "stringList"
+    },
+    "maxCompanies": {
+      "title": "Max startups to return",
+      "type": "integer",
+      "description": "Cap on startups that pass the checks.",
+      "default": 30,
+      "minimum": 1,
+      "maximum": 500
+    },
+    "maxSearchPages": {
+      "title": "Google result pages per search",
+      "type": "integer",
+      "description": "More pages find more startups but cost more on the Google Search Scraper.",
+      "default": 2,
+      "minimum": 1,
+      "maximum": 5
+    },
+    "startupScoreMin": {
+      "title": "Startup score needed",
+      "type": "integer",
+      "description": "Each website is scored on industry match and startup signs (see README). Raise this for stricter results.",
+      "default": 4,
+      "minimum": 1,
+      "maximum": 12
+    },
+    "minFoundedYear": {
+      "title": "Founded no earlier than",
+      "type": "integer",
+      "description": "Startups that state an older founding year are dropped. Websites that state none are kept.",
+      "default": 2015,
+      "minimum": 1980,
+      "maximum": 2030
+    },
+    "excludeDomains": {
+      "title": "Domains to skip",
+      "type": "array",
+      "description": "Companies you do not want, e.g. big firms or ones you already contacted.",
+      "editor": "stringList"
+    },
+    "llmQualify": {
+      "title": "Use Claude to judge each startup",
+      "type": "boolean",
+      "description": "Asks Claude whether the site is an early-stage startup in your industry. More accurate, needs an Anthropic API key.",
+      "default": false
+    },
+    "anthropicApiKey": {
+      "title": "Anthropic API key",
+      "type": "string",
+      "description": "Only used if the option above is on.",
+      "editor": "textfield",
+      "isSecret": true
+    },
+    "llmModel": {
+      "title": "Claude model",
+      "type": "string",
+      "description": "Model used for the optional startup check.",
+      "default": "claude-haiku-5-5",
+      "editor": "textfield"
+    },
+    "proxyConfiguration": {
+      "title": "Proxy",
+      "type": "object",
+      "description": "Optional. Most startup sites work without one.",
+      "editor": "proxy"
+    },
+    "onlyWithContact": {
+      "title": "Only startups with a contact",
+      "type": "boolean",
+      "description": "Drop startups where no person and no email was found.",
+      "default": true
+    },
+    "preferHiringLead": {
+      "title": "Prefer the hiring lead over the founder",
+      "type": "boolean",
+      "description": "If a startup lists a head of people, HR or talent, make them the main contact. By default the founder or CEO leads and the hiring lead is the backup.",
+      "default": false
+    },
+    "useSearch": {
+      "title": "Find startups through Google search",
+      "type": "boolean",
+      "description": "Turn off to check only the websites you list above. Search uses the Google Search Scraper, which bills your Apify account.",
+      "default": true
+    },
+    "onlyGmail": {
+      "title": "Gmail addresses only",
+      "type": "boolean",
+      "description": "Keep only Gmail addresses that the startup itself publishes on its website, and only startups that publish one. Company-domain emails are ignored. Expect far fewer results.",
+      "default": false
+    },
+    "followPersonalSites": {
+      "title": "Follow founders' own websites",
+      "type": "boolean",
+      "description": "If a team page links a founder's personal website or portfolio, read it for an email they publish themselves.",
+      "default": true
+    },
+    "guessEmails": {
+      "title": "Suggest likely company addresses",
+      "type": "boolean",
+      "description": "When no email is published for the main contact, suggests a likely company address (like first@company.com), labelled as a guess. If another address on the site shows the company's pattern, that pattern is used. Not checked for delivery, so some will bounce.",
+      "default": false
+    },
+    "findLinkedin": {
+      "title": "Find LinkedIn links for the contacts",
+      "type": "boolean",
+      "description": "If the startup's site does not link a contact's LinkedIn profile, look the person up with a Google search for their name and company. Only profile links from public search results are used, and only when name and company both match. Uses the Google Search Scraper, which bills your Apify account.",
+      "default": true
+    }
+  },
+  "required": [
+    "industryKeywords"
+  ]
+}
